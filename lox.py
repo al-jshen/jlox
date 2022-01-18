@@ -1,36 +1,37 @@
 import sys
-from scanner import Scanner
+import scanner
+
 
 class Lox:
     def __init__(self):
         self.had_error: bool = False
 
     def run(self, source: str):
-        scanner = Scanner(source, self)
-        tokens = scanner.scan_tokens()
+        _scanner = scanner.Scanner(source, self)
+        tokens = _scanner.scan_tokens()
         for t in tokens:
             print(t)
 
     # read a file and use self.run to run it
     def run_file(self, path: str):
-        with open(path, 'r') as f:
+        with open(path, "r") as f:
             self.run(f.read())
         if self.had_error:
-            sys.exit(65) 
+            sys.exit(65)
 
     def run_prompt(self):
         while True:
-            line = input('> ')
-            if line == 'exit':
+            line = input("> ")
+            if line == "exit":
                 break
             self.run(line)
             self.had_error = False
 
     def error(self, line: int, message: str):
-        self.report(line, '', message)
+        self.report(line, "", message)
 
     def report(self, line: int, where: str, message: str):
-        print(f'[line {line}] Error {where}: {message}')
+        print(f"[line {line}] Error {where}: {message}")
         self.had_error = True
 
 
@@ -39,7 +40,7 @@ if __name__ == "__main__":
     lox = Lox()
 
     # if there are no command line arguments
-    if len(args) == 0:
+    if len(args) > 1:
         # print an error message
         print("Usage: lox.py <script>")
         # exit the program
@@ -49,4 +50,3 @@ if __name__ == "__main__":
         lox.run_file(args[0])
     else:
         lox.run_prompt()
-

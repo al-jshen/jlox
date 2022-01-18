@@ -1,17 +1,36 @@
 from tokens import Token
 from token_type import TokenType
 from typing import List
-from lox import Lox
+import lox
+
+keywords = {
+    "and": TokenType.AND,
+    "class": TokenType.CLASS,
+    "else": TokenType.ELSE,
+    "false": TokenType.FALSE,
+    "for": TokenType.FOR,
+    "fun": TokenType.FUN,
+    "if": TokenType.IF,
+    "nil": TokenType.NIL,
+    "or": TokenType.OR,
+    "print": TokenType.PRINT,
+    "return": TokenType.RETURN,
+    "super": TokenType.SUPER,
+    "this": TokenType.THIS,
+    "true": TokenType.TRUE,
+    "var": TokenType.VAR,
+    "while": TokenType.WHILE,
+}
 
 
 class Scanner:
-    def __init__(self, source: str, interpreter: Lox):
+    def __init__(self, source: str, interpreter: lox.Lox):
         self.source: str = source
         self.tokens: List[Token] = []
         self.start: int = 0
         self.current: int = 0
         self.line: int = 1
-        self.interpreter: Lox = interpreter
+        self.interpreter: lox.Lox = interpreter
 
     def scan_tokens(self) -> List[Token]:
         while not self.is_at_end():
@@ -76,7 +95,21 @@ class Scanner:
             self.interpreter.error(self.line, "Unexpected character.")
 
     def string(self):
-        pass
+        while self.peek() != '"' and not self.is_at_end():
+            if self.peek() == "\n":
+                self.line += 1
+            self.advance()
+
+        if self.is_at_end():
+            self.interpreter.error(self.line, "Unterminated string.")
+            return
+
+        # The closing "
+        self.advance()
+
+        # Add stuff between quotes as token
+        value = self.source[self.start + 1 : self.current - 1]
+        self.add_token(TokenType.STRING, value)
 
     def number(self):
         while self.peek().isdigit():
@@ -91,10 +124,17 @@ class Scanner:
         self.add_token(TokenType.NUMBER, float(self.source[self.start : self.current]))
 
     def identifier(self):
-        pass
+        while self.peek().isalnum():
+            self.advance()
+
+        text = self.source[self.start : self.current]
+        if text in keywords.keys():
+            self.add_token(keywords[text])
+        else:
+            self.add_token(TokenType.IDENTIFIER)
 
     def add_token(self, token: TokenType, literal=None):
-        text: str = self.source[self.start : self.current]
+        text = self.source[self.start : self.current]
         self.tokens.append(Token(token, text, literal, self.line))
 
     def match(self, expected: str) -> bool:
