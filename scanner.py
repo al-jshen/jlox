@@ -66,8 +66,32 @@ class Scanner:
             pass
         elif c == "\n":
             self.line += 1
+        elif c == '"':
+            self.string()
+        elif c.isdigit():
+            self.number()
+        elif c.isalpha():
+            self.identifier()
         else:
             self.interpreter.error(self.line, "Unexpected character.")
+
+    def string(self):
+        pass
+
+    def number(self):
+        while self.peek().isdigit():
+            self.advance()
+
+        if self.peek() == "." and self.peek_next().isdigit():
+            self.advance()
+
+            while self.peek().isdigit():
+                self.advance()
+
+        self.add_token(TokenType.NUMBER, float(self.source[self.start : self.current]))
+
+    def identifier(self):
+        pass
 
     def add_token(self, token: TokenType, literal=None):
         text: str = self.source[self.start : self.current]
@@ -91,6 +115,11 @@ class Scanner:
         if self.is_at_end():
             return "\0"
         return self.source[self.current]
+
+    def peek_next(self) -> str:
+        if self.current + 1 >= len(self.source):
+            return "\0"
+        return self.source[self.current + 1]
 
     def is_at_end(self) -> bool:
         return self.current >= len(self.source)
