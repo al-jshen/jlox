@@ -79,6 +79,8 @@ class Scanner:
             if self.match("/"):
                 while self.peek() != "\n" and not self.is_at_end():
                     self.advance()
+            elif self.match("*"):
+                self.multiline_comment()
             else:
                 self.add_token(TokenType.SLASH)
         elif c == " " or c == "\r" or c == "\t":
@@ -93,6 +95,22 @@ class Scanner:
             self.identifier()
         else:
             self.interpreter.error(self.line, "Unexpected character.")
+
+    def multiline_comment(self):
+        while self.peek() != "*" and not self.is_at_end():
+            if self.peek() == "\n":
+                self.line += 1
+            self.advance()
+
+        if self.is_at_end():
+            self.interpreter.error(self.line, "Unterminated comment.")
+            return
+
+        self.advance()
+
+        if self.peek() == "/":
+            self.advance()
+            return
 
     def string(self):
         while self.peek() != '"' and not self.is_at_end():
