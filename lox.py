@@ -6,7 +6,7 @@ class Lox:
         self.had_error: bool = False
 
     def run(self, source: str):
-        scanner = Scanner(source)
+        scanner = Scanner(source, self)
         tokens = scanner.scan_tokens()
         for t in tokens:
             print(t)
@@ -26,7 +26,10 @@ class Lox:
             self.run(line)
             self.had_error = False
 
-    def report_error(self, line: int, where: str, message: str):
+    def error(self, line: int, message: str):
+        self.report(line, '', message)
+
+    def report(self, line: int, where: str, message: str):
         print(f'[line {line}] Error {where}: {message}')
         self.had_error = True
 
