@@ -3,7 +3,7 @@ from scanner import Scanner
 
 class Lox:
     def __init__(self):
-        self.had_error = False
+        self.had_error: bool = False
 
     def run(self, source: str):
         scanner = Scanner(source)
