@@ -1,7 +1,8 @@
-from tokens import Token
-from token_type import TokenType
 from typing import List
+
 import lox
+from token_type import TokenType
+from tokens import Token
 
 keywords = {
     "and": TokenType.AND,

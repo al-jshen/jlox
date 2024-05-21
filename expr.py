@@ -1,32 +1,32 @@
+from abc import ABC
+from dataclasses import dataclass
 from typing import Any
+
 from tokens import Token
-class Expr:
-  pass
 
+
+class Expr(ABC):
+    pass
+
+
+@dataclass
 class Binary(Expr):
-  def __init__(self, left: Expr, operator: Token, right: Expr):
-    self.left: Expr = left
-    self.operator: Token = operator
-    self.right: Expr = right
-  def __str__(self):
-    f"{self.left} {self.operator} {self.right}"
+    left: Expr
+    operator: Token
+    right: Expr
 
+
+@dataclass
 class Grouping(Expr):
-  def __init__(self, expression: Expr):
-    self.expression: Expr = expression
-  def __str__(self):
-    f"{self.expression}"
+    expression: Expr
 
+
+@dataclass
 class Literal(Expr):
-  def __init__(self, value: Any):
-    self.value: Any = value
-  def __str__(self):
-    f"{self.value}"
+    value: Any
 
+
+@dataclass
 class Unary(Expr):
-  def __init__(self, operator: Token, right: Expr):
-    self.operator: Token = operator
-    self.right: Expr = right
-  def __str__(self):
-    f"{self.operator} {self.right}"
-
+    operator: Token
+    right: Expr
