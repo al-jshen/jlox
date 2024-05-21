@@ -2,7 +2,7 @@ import sys
 from typing import Dict, List
 
 
-def generate_ast(
+def generate_ast_and_visitor(
     output_dir: str,
     base_name: str,
     types: Dict[str, str],
@@ -12,6 +12,8 @@ def generate_ast(
 
     for lib, vals in imports.items():
         code.append(f"from {lib} import {vals}\n")
+
+    # expression classes
 
     code.append(f"\nclass {base_name}(ABC):\n")
     code.append("\tdef accept(self, visitor):\n")
@@ -25,6 +27,19 @@ def generate_ast(
             code.append(f"\t{field_name}: {field_type}\n")
         code.append("\n")
 
+    # visitor interface
+    code.append(f"class {base_name}Visitor(ABC):\n")
+    code.append("\tdef visit(self, expr: Expr):\n")
+    for class_name in types.keys():
+        code.append(f"\t\tif isinstance(expr, {class_name}):\n")
+        code.append(f"\t\t\treturn self.visit_{class_name.lower()}(expr)\n")
+    code.append("\n")
+
+    for class_name in types.keys():
+        code.append("\t@abstractmethod\n")
+        code.append(f"\tdef visit_{class_name.lower()}(self, expr: {class_name}):\n")
+        code.append("\t\tpass\n")
+
     with open(f"{output_dir}/{base_name.lower()}.py", "w") as f:
         f.writelines(code)
 
@@ -36,7 +51,7 @@ if __name__ == "__main__":
 
     output_dir = sys.argv[1]
 
-    generate_ast(
+    generate_ast_and_visitor(
         output_dir=output_dir,
         base_name="Expr",
         types={
@@ -48,7 +63,7 @@ if __name__ == "__main__":
         imports={
             "typing": "Any",
             "tokens": "Token",
-            "abc": "ABC",
+            "abc": "ABC, abstractmethod",
             "dataclasses": "dataclass",
         },
     )
