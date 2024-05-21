@@ -4,7 +4,8 @@ from abc import ABC
 from dataclasses import dataclass
 
 class Expr(ABC):
-  pass
+	def accept(self, visitor):
+		return visitor.visit(self)
 
 class Binary(Expr):
 	left: Expr

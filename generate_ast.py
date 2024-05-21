@@ -13,7 +13,9 @@ def generate_ast(
     for lib, vals in imports.items():
         code.append(f"from {lib} import {vals}\n")
 
-    code.append(f"\nclass {base_name}(ABC):\n  pass\n\n")
+    code.append(f"\nclass {base_name}(ABC):\n")
+    code.append("\tdef accept(self, visitor):\n")
+    code.append("\t\treturn visitor.visit(self)\n\n")
 
     for class_name, fields in types.items():
         code.append(f"class {class_name}({base_name}):\n")
