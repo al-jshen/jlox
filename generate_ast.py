@@ -18,6 +18,7 @@ def generate_ast(
     code.append("\t\treturn visitor.visit(self)\n\n")
 
     for class_name, fields in types.items():
+        code.append("@dataclass\n")
         code.append(f"class {class_name}({base_name}):\n")
         for field in fields.split(", "):
             field_name, field_type = field.split(": ")
