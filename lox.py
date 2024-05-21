@@ -1,4 +1,8 @@
 import sys
+
+from ast_printer import AstPrinter
+from error import LoxError
+from parser import Parser
 import scanner
 
 
@@ -9,8 +13,13 @@ class Lox:
     def run(self, source: str):
         _scanner = scanner.Scanner(source, self)
         tokens = _scanner.scan_tokens()
-        for t in tokens:
-            print(t)
+        parser = Parser(tokens)
+        expression = parser.parse()
+        if isinstance(expression, LoxError):
+            self.had_error = True
+            return
+        printer = AstPrinter()
+        print(printer.print(expression))
 
     # read a file and use self.run to run it
     def run_file(self, path: str):
@@ -26,13 +35,6 @@ class Lox:
                 break
             self.run(line)
             self.had_error = False
-
-    def error(self, line: int, message: str):
-        self.report(line, "", message)
-
-    def report(self, line: int, where: str, message: str):
-        print(f"[line {line}] Error {where}: {message}")
-        self.had_error = True
 
 
 if __name__ == "__main__":
