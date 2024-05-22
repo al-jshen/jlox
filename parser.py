@@ -22,10 +22,10 @@ class Parser:
         self.tokens = tokens
         self.current = 0
 
-    def expression(self) -> Expr | ParseError:
+    def expression(self) -> Expr:
         return self.equality()
 
-    def equality(self) -> Expr | ParseError:
+    def equality(self) -> Expr:
         expr = self.comparison()
 
         while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
@@ -35,7 +35,7 @@ class Parser:
 
         return expr
 
-    def comparison(self) -> Expr | ParseError:
+    def comparison(self) -> Expr:
         expr = self.term()
 
         while self.match(
@@ -50,7 +50,7 @@ class Parser:
 
         return expr
 
-    def term(self) -> Expr | ParseError:
+    def term(self) -> Expr:
         expr = self.factor()
 
         while self.match(TokenType.MINUS, TokenType.PLUS):
@@ -60,7 +60,7 @@ class Parser:
 
         return expr
 
-    def factor(self) -> Expr | ParseError:
+    def factor(self) -> Expr:
         expr = self.unary()
 
         while self.match(TokenType.SLASH, TokenType.STAR):
@@ -70,7 +70,7 @@ class Parser:
 
         return expr
 
-    def unary(self) -> Expr | ParseError:
+    def unary(self) -> Expr:
         if self.match(TokenType.BANG, TokenType.MINUS):
             operator = self.previous()
             right = self.unary()
@@ -78,7 +78,7 @@ class Parser:
 
         return self.primary()
 
-    def primary(self) -> Expr | ParseError:
+    def primary(self) -> Expr:
         if self.match(TokenType.NUMBER, TokenType.STRING):
             return Literal(self.previous().literal)
 
@@ -96,9 +96,9 @@ class Parser:
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return Grouping(expr)
 
-        return ParseError(self.peek(), "Expect expression.")
+        raise ParseError(self.peek(), "Expect expression.")
 
-    def consume(self, type: TokenType, message: str) -> Token | ParseError:
+    def consume(self, type: TokenType, message: str) -> Token:
         if self.check(type):
             return self.advance()
 
@@ -155,11 +155,14 @@ class Parser:
             self.advance()
 
     def parse(self):
-        statements: list[Stmt] = []
-        while not self.is_at_end():
-            statements.append(self.statement())
+        try:
+            statements: list[Stmt] = []
+            while not self.is_at_end():
+                statements.append(self.statement())
 
-        return statements
+            return statements
+        except ParseError as e:
+            print(e)
 
     def statement(self):
         if self.match(TokenType.PRINT):
