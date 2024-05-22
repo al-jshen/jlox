@@ -30,3 +30,8 @@ class Unary(Expr):
 class Variable(Expr):
 	name: Token
 
+@dataclass
+class Assign(Expr):
+	name: Token
+	value: Expr
+

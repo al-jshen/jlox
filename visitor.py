@@ -13,6 +13,8 @@ class Visitor(ABC):
 			return self.visit_unary_expr(val)
 		if isinstance(val, Variable):
 			return self.visit_variable_expr(val)
+		if isinstance(val, Assign):
+			return self.visit_assign_expr(val)
 		if isinstance(val, Expression):
 			return self.visit_expression_stmt(val)
 		if isinstance(val, Print):
@@ -34,6 +36,9 @@ class Visitor(ABC):
 		pass
 	@abstractmethod
 	def visit_variable_expr(self, expr: Variable):
+		pass
+	@abstractmethod
+	def visit_assign_expr(self, expr: Assign):
 		pass
 	@abstractmethod
 	def visit_expression_stmt(self, stmt: Expression):

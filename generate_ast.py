@@ -94,6 +94,7 @@ if __name__ == "__main__":
         "Literal": "value: Any",
         "Unary": "operator: Token, right: Expr",
         "Variable": "name: Token",
+        "Assign": "name: Token, value: Expr",
     }
     outs.extend(generate_ast(base_name="Expr", types=expr_types))
 
