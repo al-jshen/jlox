@@ -16,10 +16,10 @@ class ParseError(LoxError, Exception):
         else:
             msg = self.make_error(token.line, f"at '{token.lexeme}'", message)
 
-        super(Exception).__init__(msg)
+        super().__init__(msg)
 
 
 class LoxRuntimeError(LoxError, Exception):
     def __init__(self, token: Token, message: str):
         msg = self.make_error(token.line, "", message)
-        super(Exception).__init__(msg)
+        super().__init__(msg)
