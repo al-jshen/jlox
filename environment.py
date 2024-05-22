@@ -1,0 +1,18 @@
+from typing import Any
+
+from error import LoxRuntimeError
+from tokens import Token
+
+
+class Environment:
+    def __init__(self):
+        self.values = {}
+
+    def define(self, name: str, value: Any):
+        self.values[name] = value
+
+    def get(self, name: Token):
+        if name.lexeme in self.values.keys():
+            return self.values[name.lexeme]
+
+        raise LoxRuntimeError(name, "Undefined variable '" + name.lexeme + "'.")

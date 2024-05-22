@@ -11,10 +11,14 @@ class Visitor(ABC):
 			return self.visit_literal_expr(val)
 		if isinstance(val, Unary):
 			return self.visit_unary_expr(val)
+		if isinstance(val, Variable):
+			return self.visit_variable_expr(val)
 		if isinstance(val, Expression):
 			return self.visit_expression_stmt(val)
 		if isinstance(val, Print):
 			return self.visit_print_stmt(val)
+		if isinstance(val, Var):
+			return self.visit_var_stmt(val)
 
 	@abstractmethod
 	def visit_binary_expr(self, expr: Binary):
@@ -29,8 +33,14 @@ class Visitor(ABC):
 	def visit_unary_expr(self, expr: Unary):
 		pass
 	@abstractmethod
+	def visit_variable_expr(self, expr: Variable):
+		pass
+	@abstractmethod
 	def visit_expression_stmt(self, stmt: Expression):
 		pass
 	@abstractmethod
 	def visit_print_stmt(self, stmt: Print):
+		pass
+	@abstractmethod
+	def visit_var_stmt(self, stmt: Var):
 		pass

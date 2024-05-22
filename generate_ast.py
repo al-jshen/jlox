@@ -73,9 +73,10 @@ if __name__ == "__main__":
 
     output_dir = sys.argv[1]
 
+    # expressions
+
     outs = []
 
-    # generate imports
     outs.extend(
         generate_imports(
             imports={
@@ -87,23 +88,26 @@ if __name__ == "__main__":
         )
     )
 
-    # generate expression classes and visitor
     expr_types = {
         "Binary": "left: Expr, operator: Token, right: Expr",
         "Grouping": "expression: Expr",
         "Literal": "value: Any",
         "Unary": "operator: Token, right: Expr",
+        "Variable": "name: Token",
     }
     outs.extend(generate_ast(base_name="Expr", types=expr_types))
 
     with open(f"{output_dir}/expr.py", "w") as f:
         f.writelines(outs)
 
+    # statements
+
     outs = []
 
     outs.extend(
         generate_imports(
             imports={
+                "tokens": "Token",
                 "expr": "Expr",
                 "abc": "ABC, abstractmethod",
                 "dataclasses": "dataclass",
@@ -111,15 +115,17 @@ if __name__ == "__main__":
         )
     )
 
-    # generate statement classes and visitor
     stmt_types = {
         "Expression": "expression: Expr",
         "Print": "expression: Expr",
+        "Var": "name: Token, initializer: Expr",
     }
     outs.extend(generate_ast(base_name="Stmt", types=stmt_types))
 
     with open(f"{output_dir}/stmt.py", "w") as f:
         f.writelines(outs)
+
+    # visitor
 
     outs = []
 

@@ -1,14 +1,18 @@
 from typing import Any
 
+from environment import Environment
 from error import LoxRuntimeError
-from expr import Binary, Expr, Grouping, Literal, Unary
-from stmt import Expression, Print, Stmt
+from expr import Binary, Expr, Grouping, Literal, Unary, Variable
+from stmt import Expression, Print, Stmt, Var
 from token_type import TokenType
 from tokens import Token
 from visitor import Visitor
 
 
 class Interpreter(Visitor):
+    def __init__(self):
+        self.environment = Environment()
+
     def visit_binary_expr(self, expr: Binary):
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
@@ -122,3 +126,13 @@ class Interpreter(Visitor):
     def visit_print_stmt(self, stmt: Print):
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
+
+    def visit_var_stmt(self, stmt: Var):
+        value = None
+        if stmt.initializer is not None:
+            value = self.evaluate(stmt.initializer)
+
+        self.environment.define(stmt.name.lexeme, value)
+
+    def visit_variable_expr(self, expr: Variable):
+        return self.environment.get(expr.name)

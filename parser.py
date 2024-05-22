@@ -1,6 +1,6 @@
 from error import ParseError
-from expr import Binary, Expr, Grouping, Literal, Unary
-from stmt import Expression, Print, Stmt
+from expr import Binary, Expr, Grouping, Literal, Unary, Variable
+from stmt import Expression, Print, Stmt, Var
 from token_type import TokenType
 from tokens import Token
 
@@ -79,9 +79,6 @@ class Parser:
         return self.primary()
 
     def primary(self) -> Expr:
-        if self.match(TokenType.NUMBER, TokenType.STRING):
-            return Literal(self.previous().literal)
-
         if self.match(TokenType.TRUE):
             return Literal(True)
 
@@ -90,6 +87,12 @@ class Parser:
 
         if self.match(TokenType.NIL):
             return Literal(None)
+
+        if self.match(TokenType.NUMBER, TokenType.STRING):
+            return Literal(self.previous().literal)
+
+        if self.match(TokenType.IDENTIFIER):
+            return Variable(self.previous())
 
         if self.match(TokenType.LEFT_PAREN):
             expr = self.expression()
@@ -158,7 +161,7 @@ class Parser:
         try:
             statements: list[Stmt] = []
             while not self.is_at_end():
-                statements.append(self.statement())
+                statements.append(self.declaration())
 
             return statements
         except ParseError as e:
@@ -169,6 +172,26 @@ class Parser:
             return self.print_statement()
 
         return self.expression_statement()
+
+    def declaration(self):
+        try:
+            if self.match(TokenType.VAR):
+                return self.var_declaration()
+
+            return self.statement()
+        except ParseError as e:
+            self.synchronize()
+
+    def var_declaration(self):
+        # varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+        name = self.consume(TokenType.IDENTIFIER, "Expect variable name.")
+
+        initializer = None
+        if self.match(TokenType.EQUAL):
+            initializer = self.expression()
+
+        self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return Var(name, initializer)
 
     def print_statement(self):
         value = self.expression()

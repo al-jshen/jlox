@@ -1,3 +1,4 @@
+from tokens import Token
 from expr import Expr
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -13,4 +14,9 @@ class Expression(Stmt):
 @dataclass
 class Print(Stmt):
 	expression: Expr
+
+@dataclass
+class Var(Stmt):
+	name: Token
+	initializer: Expr
 
