@@ -1,25 +1,21 @@
 import sys
 
-from ast_printer import AstPrinter
-from error import LoxError
+from interpreter import Interpreter
 from parser import Parser
 import scanner
 
 
 class Lox:
     def __init__(self):
+        self.interpreter = Interpreter()
         self.had_error: bool = False
 
     def run(self, source: str):
         _scanner = scanner.Scanner(source, self)
         tokens = _scanner.scan_tokens()
         parser = Parser(tokens)
-        expression = parser.parse()
-        if isinstance(expression, LoxError):
-            self.had_error = True
-            return
-        printer = AstPrinter()
-        print(printer.print(expression))
+        statements = parser.parse()
+        self.interpreter.interpret(statements)
 
     # read a file and use self.run to run it
     def run_file(self, path: str):
