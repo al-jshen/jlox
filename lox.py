@@ -15,6 +15,9 @@ class Lox:
         tokens = _scanner.scan_tokens()
         parser = Parser(tokens)
         statements = parser.parse()
+        if statements is None:
+            self.had_error = True
+            return
         self.interpreter.interpret(statements)
 
     # read a file and use self.run to run it
