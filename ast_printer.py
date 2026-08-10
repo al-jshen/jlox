@@ -1,24 +1,25 @@
-from expr import Binary, Expr, ExprVisitor, Grouping, Literal, Unary
+from expr import Binary, Expr, Grouping, Literal, Unary
 from token_type import TokenType
 from tokens import Token
+from visitor import Visitor
 
 
-class AstPrinter(ExprVisitor):
+class AstPrinter(Visitor):
     def print(self, expr: Expr):
         return expr.accept(self)
 
-    def visit_binary(self, expr: Binary):
+    def visit_binary_expr(self, expr: Binary):
         return self.parenthesize(expr.operator.lexeme, expr.left, expr.right)
 
-    def visit_grouping(self, expr: Grouping):
+    def visit_grouping_expr(self, expr: Grouping):
         return self.parenthesize("group", expr.expression)
 
-    def visit_literal(self, expr: Literal):
+    def visit_literal_expr(self, expr: Literal):
         if expr.value is None:
             return "nil"
         return str(expr.value)
 
-    def visit_unary(self, expr: Unary):
+    def visit_unary_expr(self, expr: Unary):
         return self.parenthesize(expr.operator.lexeme, expr.right)
 
     def parenthesize(self, name: str, *exprs: Expr):
